@@ -1,5 +1,6 @@
 import { Router } from 'express';
 import passport from 'passport';
+import jwt from 'jsonwebtoken';
 
 const userRouter = Router();
 
@@ -23,16 +24,14 @@ userRouter.post('/login', (req,res,next) => {
             }
             req.login(user, { session: false}, async error => {
                 if(error) return next(error)
-                const body = {id: user._id, email: user.email}
-                res.json(body)
+                const body = { _id: user._id, email: user.email}
+                const token = jwt.sign({ user:body }, process.env.SECRET_KEYWORD)
+                res.json({token, body})
             })
         } catch (error) {
             return next(error)
         }
     })(req,res,next)
 })
-
-
-
 
 export default userRouter;

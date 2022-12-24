@@ -3,6 +3,10 @@ import { Strategy } from 'passport-local';
 
 import UserModel from '../models/userModel.js';
 
+import JWT from 'passport-jwt';
+
+const { Strategy: JWTstrategy, ExtractJwt} = JWT
+
 passport.use(
     'signup',
     new Strategy({
@@ -44,6 +48,22 @@ passport.use(
             return done(error)
         }
     })
+)
+
+passport.use(
+    new JWTstrategy(
+        {
+            secretOrKey: process.env.SECRET_KEYWORD,
+            jwtFromRequest: ExtractJwt.fromUrlQueryParameter('token')
+        },
+        async (token, done) => {
+            try {
+                return done(null, token.user)
+            } catch (error) {
+                done(error)
+            }
+        }
+    )
 )
 
 export default passport;
